@@ -1,0 +1,17 @@
+[package]
+name = "nail_core"
+version = "0.1.0"
+authors = ["Luke De Mouy <lukedemouy@gmail.com>"]
+edition = "2018"
+description = """
+New Adventures In Lines Engine - An event driven framework for 
+writing Text Adventure Games. 
+"""
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# Local
+nail_common = { path = "../nail_common" }
+# Remote
+crossbeam = "0.8"

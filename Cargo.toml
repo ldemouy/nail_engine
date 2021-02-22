@@ -1,0 +1,4 @@
+[workspace]
+members = ["nail_common", "nail_core", "nail_lexer", "nail_tui", "nail_adventure"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

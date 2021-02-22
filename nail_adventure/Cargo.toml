@@ -1,0 +1,30 @@
+[package]
+name = "nail_adventure"
+version = "0.1.0"
+authors = ["Luke De Mouy <lukedemouy@gmail.com>"]
+edition = "2018"
+description = """
+An example text based adventure game, that is used to develop
+ the capabilities of the nail engine.
+"""
+
+[lib]
+name = "adventure_lib"
+path = "src/lib.rs"
+
+[[bin]]
+name = "adventure"
+path = "src/main.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# local
+nail_core = { path = "../nail_core" }
+nail_lexer = { path = "../nail_lexer" }
+nail_tui = { path = "../nail_tui" }
+
+# Remote
+crossbeam = "0.8"
+serde = { version = "~1", features = ["derive"] }
+serde_json = "~1"
