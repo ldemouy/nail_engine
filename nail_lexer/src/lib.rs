@@ -53,7 +53,7 @@ mod tests {
     use crate::Grammar;
 
     fn create_lexer() -> Result<Lexer, Error> {
-        let path = Path::new("test/grammar.json");
+        let path = Path::new("tests/grammar.json");
         let file = File::open(&path)?;
         let mut reader = std::io::BufReader::new(&file);
         let grammar: Vec<Grammar> = serde_json::from_reader(&mut reader)?;
