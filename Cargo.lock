@@ -139,6 +139,7 @@ version = "0.1.0"
 dependencies = [
  "nail_common",
  "serde",
+ "serde_json",
 ]
 
 [[package]]

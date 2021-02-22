@@ -11,3 +11,6 @@ edition = "2018"
 nail_common = { path = "../nail_common" }
 # Remote
 serde = { version = "~1", features = ["derive"] }
+
+[dev-dependencies]
+serde_json = "~1"

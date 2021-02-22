@@ -1,7 +1,7 @@
 #[derive(Debug)]
 pub struct Token {
-    variant: String,
-    contents: String,
+    pub variant: String,
+    pub contents: String,
 }
 
 #[derive(Debug, Clone)]
