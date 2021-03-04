@@ -114,6 +114,7 @@ name = "nail_adventure"
 version = "0.1.0"
 dependencies = [
  "crossbeam",
+ "nail_common",
  "nail_core",
  "nail_lexer",
  "nail_tui",

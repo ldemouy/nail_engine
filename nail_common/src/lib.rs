@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Token {
     pub variant: String,
     pub contents: String,
@@ -6,8 +6,8 @@ pub struct Token {
 
 #[derive(Debug, Clone)]
 pub struct Message {
-    action: String,
-    parameters: Vec<String>,
+    pub action: Token,
+    pub parameters: Vec<Token>,
 }
 
 #[cfg(test)]

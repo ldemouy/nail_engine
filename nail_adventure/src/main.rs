@@ -1,27 +1,19 @@
 use std::io;
 
+use nail_lexer::Lexer;
+
 fn main() {
     println!("Input: ");
+    let (write, read) = crossbeam::channel::unbounded();
+    let listener = adventure_lib::Listener { read, write };
     let lexer = load_lexer().unwrap();
+    let mut core = nail_core::engine::Engine {
+        listeners: vec![Box::new(listener)],
+    };
     loop {
-        let mut buffer = String::new();
-        let stdin = io::stdin();
-        stdin.read_line(&mut buffer).unwrap();
-        let buffer = buffer.trim();
-
-        if buffer.is_empty() {
-            continue;
+        if let Some(message) = read_message(&lexer) {
+            core.tick(&[message]);
         }
-
-        let tokens = lexer.lex(&buffer);
-        for token in tokens {
-            println!("{:?}", token);
-            if token.variant == "foo" {
-                println!("BAR!");
-            }
-        }
-
-        println!();
     }
 }
 
@@ -35,4 +27,23 @@ fn load_lexer() -> Result<nail_lexer::Lexer, std::io::Error> {
     let grammar: Vec<Grammar> = serde_json::from_reader(&mut reader)?;
 
     Ok(Lexer::new(grammar))
+}
+
+fn read_message(lexer: &Lexer) -> Option<nail_common::Message> {
+    let mut buffer = String::new();
+    let stdin = io::stdin();
+    stdin.read_line(&mut buffer).unwrap();
+    let buffer = buffer.trim();
+
+    if buffer.is_empty() {
+        return None;
+    }
+
+    let mut tokens = lexer.lex(&buffer);
+    let action = tokens.first().unwrap().to_owned();
+    tokens.remove(0);
+    Some(nail_common::Message {
+        action,
+        parameters: tokens,
+    })
 }

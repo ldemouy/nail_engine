@@ -20,6 +20,7 @@ path = "src/main.rs"
 
 [dependencies]
 # local
+nail_common = { path = "../nail_common" }
 nail_core = { path = "../nail_core" }
 nail_lexer = { path = "../nail_lexer" }
 nail_tui = { path = "../nail_tui" }

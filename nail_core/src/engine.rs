@@ -18,10 +18,18 @@ pub struct Engine {
 impl Engine {
     pub fn tick(&mut self, messages: &[nail_common::Message]) {
         for listener in self.listeners.iter() {
-            let sender = &mut listener.get_sender();
+            let sender = listener.get_sender();
             for message in messages.iter() {
                 sender.send(message.clone()).unwrap();
             }
+            let receiver = listener.get_receiver();
+            let message = receiver.recv().unwrap();
+
+            println!("{:?}", message);
+            if message.action.variant == "foo" {
+                println!("BAR!");
+            }
+            println!();
         }
     }
 }
