@@ -1,27 +1,43 @@
-use std::io;
-
 use adventure_lib::modules::*;
+use crossbeam::channel::{Receiver, Sender};
+use nail_common::Message;
+use nail_core::traits::Listener;
 use nail_lexer::Lexer;
+use std::io;
 
 fn main() {
     println!("Input: ");
     let (write, read) = crossbeam::channel::unbounded();
-    let module = EchoModule {};
-    let thread_write = module.start(write.clone());
-    let listener = adventure_lib::Listener {
-        read,
-        write: thread_write,
-    };
-
+    let modules = initialize_modules();
+    let listeners = wire_modules_to_core(&modules, read, write);
     let lexer = load_lexer().unwrap();
-    let mut core = nail_core::engine::Engine {
-        listeners: vec![Box::new(listener)],
-    };
+    let mut core = nail_core::engine::Engine { listeners };
     loop {
         if let Some(message) = read_message(&lexer) {
             core.tick(&[message]);
         }
     }
+}
+
+fn initialize_modules() -> Vec<Box<dyn Module>> {
+    vec![Box::new(EchoModule::new())]
+}
+
+fn wire_modules_to_core(
+    modules: &[Box<dyn Module>],
+    read: Receiver<Message>,
+    write: Sender<Message>,
+) -> Vec<Box<dyn Listener>> {
+    let mut result: Vec<Box<dyn Listener>> = vec![];
+    for module in modules {
+        let thread_write = module.start(write.clone());
+        let listener = adventure_lib::Listener {
+            read: read.clone(),
+            write: thread_write,
+        };
+        result.push(Box::new(listener));
+    }
+    result
 }
 
 fn load_lexer() -> Result<nail_lexer::Lexer, std::io::Error> {

@@ -5,7 +5,14 @@ pub trait Module {
     fn start(&self, core_write: Sender<Message>) -> Sender<Message>;
 }
 
+#[derive(Debug, Default)]
 pub struct EchoModule {}
+
+impl EchoModule {
+    pub fn new() -> EchoModule {
+        EchoModule {}
+    }
+}
 
 impl Module for EchoModule {
     fn start(&self, _: Sender<Message>) -> Sender<Message> {
