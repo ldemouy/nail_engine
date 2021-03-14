@@ -1,3 +1,4 @@
+pub mod modules;
 use nail_tui::{DirectionHint, MappableExit};
 use serde::{Deserialize, Serialize};
 

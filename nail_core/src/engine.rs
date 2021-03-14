@@ -22,14 +22,14 @@ impl Engine {
             for message in messages.iter() {
                 sender.send(message.clone()).unwrap();
             }
-            let receiver = listener.get_receiver();
+            /*let receiver = listener.get_receiver();
             let message = receiver.recv().unwrap();
 
             println!("{:?}", message);
             if message.action.variant == "foo" {
                 println!("BAR!");
             }
-            println!();
+            println!();*/
         }
     }
 }

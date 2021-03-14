@@ -1,11 +1,18 @@
 use std::io;
 
+use adventure_lib::modules::*;
 use nail_lexer::Lexer;
 
 fn main() {
     println!("Input: ");
     let (write, read) = crossbeam::channel::unbounded();
-    let listener = adventure_lib::Listener { read, write };
+    let module = EchoModule {};
+    let thread_write = module.start(write.clone());
+    let listener = adventure_lib::Listener {
+        read,
+        write: thread_write,
+    };
+
     let lexer = load_lexer().unwrap();
     let mut core = nail_core::engine::Engine {
         listeners: vec![Box::new(listener)],
