@@ -25,8 +25,8 @@ fn initialize_modules() -> Vec<Box<dyn Module>> {
 
 fn wire_modules_to_core(
     modules: &[Box<dyn Module>],
-    read: Receiver<Message>,
-    write: Sender<Message>,
+    read: Receiver<Option<Message>>,
+    write: Sender<Option<Message>>,
 ) -> Vec<Box<dyn Listener>> {
     let mut result: Vec<Box<dyn Listener>> = vec![];
     for module in modules {

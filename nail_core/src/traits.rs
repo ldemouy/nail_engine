@@ -28,6 +28,6 @@ where
 }
 
 pub trait Listener {
-    fn get_receiver(&self) -> &crossbeam::channel::Receiver<nail_common::Message>;
-    fn get_sender(&self) -> &crossbeam::channel::Sender<nail_common::Message>;
+    fn get_receiver(&self) -> &crossbeam::channel::Receiver<Option<nail_common::Message>>;
+    fn get_sender(&self) -> &crossbeam::channel::Sender<Option<nail_common::Message>>;
 }

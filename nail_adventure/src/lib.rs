@@ -23,8 +23,8 @@ pub struct Room {
 }
 
 pub struct Listener {
-    pub read: crossbeam::channel::Receiver<nail_common::Message>,
-    pub write: crossbeam::channel::Sender<nail_common::Message>,
+    pub read: crossbeam::channel::Receiver<Option<nail_common::Message>>,
+    pub write: crossbeam::channel::Sender<Option<nail_common::Message>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -90,11 +90,11 @@ impl nail_core::traits::Room<Exit, Item> for Room {
 }
 
 impl nail_core::traits::Listener for Listener {
-    fn get_receiver(&self) -> &crossbeam::channel::Receiver<nail_common::Message> {
+    fn get_receiver(&self) -> &crossbeam::channel::Receiver<Option<nail_common::Message>> {
         &self.read
     }
 
-    fn get_sender(&self) -> &crossbeam::channel::Sender<nail_common::Message> {
+    fn get_sender(&self) -> &crossbeam::channel::Sender<Option<nail_common::Message>> {
         &self.write
     }
 }

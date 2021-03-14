@@ -18,20 +18,24 @@ pub struct Engine {
 }
 
 impl Engine {
-    pub fn tick(&mut self, messages: &[nail_common::Message]) {
+    pub fn tick(&self, messages: &[nail_common::Message]) {
         for listener in self.listeners.iter() {
             let sender = listener.get_sender();
             for message in messages.iter() {
-                sender.send(message.clone()).unwrap();
+                sender.send(Some(message.clone())).unwrap();
             }
-            let reader = listener.get_receiver().clone();
-            let sender_clone = sender.clone();
-            thread::spawn(move || {
+            let reader = listener.get_receiver();
+
+            if let Some(message) = reader.recv().unwrap() {
+                let mut messages = vec![];
+                messages.push(message);
                 while !reader.is_empty() {
-                    let message = reader.recv().unwrap();
-                    sender_clone.send(message).unwrap();
+                    if let Some(message) = reader.recv().unwrap() {
+                        messages.push(message);
+                    }
                 }
-            });
+                self.tick(&messages);
+            }
         }
     }
 }
