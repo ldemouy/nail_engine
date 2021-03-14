@@ -26,6 +26,7 @@ impl Engine {
             }
             let reader = listener.get_receiver();
 
+            //we need to block to read first message
             if let Some(message) = reader.recv().unwrap() {
                 let mut messages = vec![];
                 messages.push(message);
