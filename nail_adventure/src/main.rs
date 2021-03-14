@@ -2,20 +2,13 @@ use adventure_lib::modules::*;
 use crossbeam::channel::{Receiver, Sender};
 use nail_common::Message;
 use nail_core::engine::Listener;
-use std::thread;
 
 fn main() {
-    thread::spawn(move || {
-        let (write, read) = crossbeam::channel::unbounded();
-        let modules = initialize_modules();
-        let listeners = wire_modules_to_core(&modules, read, write);
-        let core = nail_core::engine::Engine::new(&listeners);
-        core.send(&[Message::Initialize]);
-    });
-
-    loop {
-        std::thread::sleep(std::time::Duration::from_secs(1));
-    }
+    let (write, read) = crossbeam::channel::unbounded();
+    let modules = initialize_modules();
+    let listeners = wire_modules_to_core(&modules, read, write);
+    let core = nail_core::engine::Engine::new(&listeners);
+    core.send(&[Message::Initialize]);
 }
 
 fn initialize_modules() -> Vec<Box<dyn Module>> {
