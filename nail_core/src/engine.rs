@@ -1,3 +1,5 @@
+use std::thread;
+
 #[derive(Debug)]
 pub enum Event<I>
 where
@@ -22,14 +24,14 @@ impl Engine {
             for message in messages.iter() {
                 sender.send(message.clone()).unwrap();
             }
-            /*let receiver = listener.get_receiver();
-            let message = receiver.recv().unwrap();
-
-            println!("{:?}", message);
-            if message.action.variant == "foo" {
-                println!("BAR!");
-            }
-            println!();*/
+            let reader = listener.get_receiver().clone();
+            let sender_clone = sender.clone();
+            thread::spawn(move || {
+                while !reader.is_empty() {
+                    let message = reader.recv().unwrap();
+                    sender_clone.send(message).unwrap();
+                }
+            });
         }
     }
 }

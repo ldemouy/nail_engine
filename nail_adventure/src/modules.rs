@@ -15,13 +15,23 @@ impl EchoModule {
 }
 
 impl Module for EchoModule {
-    fn start(&self, _: Sender<Message>) -> Sender<Message> {
+    fn start(&self, core_write: Sender<Message>) -> Sender<Message> {
         let (thread_write, thread_read): (Sender<Message>, Receiver<Message>) =
             crossbeam::channel::unbounded();
         thread::spawn(move || loop {
             let message = thread_read.recv().unwrap();
             println!("{:?}", message);
             if message.action.variant == "foo" {
+                core_write
+                    .send(Message {
+                        action: nail_common::Token {
+                            variant: "BAR!".to_string(),
+                            contents: "".to_string(),
+                        },
+                        parameters: vec![],
+                    })
+                    .unwrap();
+            } else if message.action.variant == "BAR!" {
                 println!("BAR!");
             }
             println!();
