@@ -1,5 +1,4 @@
-use crossbeam::thread;
-
+use rayon::prelude::*;
 #[derive(Debug)]
 pub enum Event<I>
 where
@@ -14,62 +13,61 @@ where
 }
 
 #[derive(Debug, Clone)]
-pub struct Listener {
-    read: crossbeam::channel::Receiver<Option<nail_common::Message>>,
-    write: crossbeam::channel::Sender<Option<nail_common::Message>>,
+pub struct Listener<T: Clone + Send + Sync> {
+    read: crossbeam::channel::Receiver<Option<T>>,
+    write: crossbeam::channel::Sender<T>,
 }
 
-impl Listener {
+impl<T: Clone + Send + Sync> Listener<T> {
     pub fn new(
-        read: crossbeam::channel::Receiver<Option<nail_common::Message>>,
-        write: crossbeam::channel::Sender<Option<nail_common::Message>>,
-    ) -> Listener {
+        read: crossbeam::channel::Receiver<Option<T>>,
+        write: crossbeam::channel::Sender<T>,
+    ) -> Listener<T> {
         Listener { read, write }
     }
 
-    pub fn get_receiver(&self) -> &crossbeam::channel::Receiver<Option<nail_common::Message>> {
+    pub fn get_receiver(&self) -> &crossbeam::channel::Receiver<Option<T>> {
         &self.read
     }
 
-    pub fn get_sender(&self) -> &crossbeam::channel::Sender<Option<nail_common::Message>> {
+    pub fn get_sender(&self) -> &crossbeam::channel::Sender<T> {
         &self.write
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct Engine {
-    pub listeners: Vec<Listener>,
+pub struct Engine<T: Clone + Send + Sync> {
+    pub listeners: Vec<Listener<T>>,
 }
 
-impl Engine {
-    pub fn new(listeners: &[Listener]) -> Engine {
+impl<T: Clone + Send + Sync> Engine<T> {
+    pub fn new(listeners: &[Listener<T>]) -> Engine<T> {
         Engine {
             listeners: listeners.to_vec(),
         }
     }
-    pub fn tick(&self, messages: &[nail_common::Message]) {
-        for listener in self.listeners.iter() {
+    pub fn send(&self, messages: &[T]) {
+        self.listeners.par_iter().for_each(|listener| {
             let sender = listener.get_sender();
-            for message in messages.iter() {
-                sender.send(Some(message.clone())).unwrap();
-            }
+            messages.par_iter().for_each(|message| {
+                sender.send(message.clone()).unwrap();
+            });
+
             let reader = listener.get_receiver();
-            thread::scope(move |_| {
-                //we need to block to read first message
-                if let Some(message) = reader.recv().unwrap() {
-                    let mut messages = vec![];
-                    messages.push(message);
 
-                    while !reader.is_empty() {
-                        if let Some(message) = reader.recv().unwrap() {
-                            messages.push(message);
-                        }
+            //we need to block to read first message
+            if let Some(message) = reader.recv().unwrap() {
+                let mut messages = vec![];
+                messages.push(message);
+
+                while !reader.is_empty() {
+                    if let Some(message) = reader.recv().unwrap() {
+                        messages.push(message);
                     }
-
-                    self.tick(&messages);
                 }
-            })
-            .unwrap();
-        }
+
+                self.send(&messages);
+            }
+        });
     }
 }

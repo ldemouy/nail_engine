@@ -15,3 +15,4 @@ writing Text Adventure Games.
 nail_common = { path = "../nail_common" }
 # Remote
 crossbeam = "0.8"
+rayon = "1.5"

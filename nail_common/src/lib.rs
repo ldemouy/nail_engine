@@ -5,9 +5,13 @@ pub struct Token {
 }
 
 #[derive(Debug, Clone)]
-pub struct Message {
-    pub action: Token,
-    pub parameters: Vec<Token>,
+pub enum Message {
+    Initialize,
+    RawInput(String),
+    TokenMessage {
+        action: Token,
+        parameters: Vec<Token>,
+    },
 }
 
 #[cfg(test)]
