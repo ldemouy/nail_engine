@@ -1,7 +1,7 @@
 use adventure_lib::modules::*;
 use crossbeam::channel::{Receiver, Sender};
 use nail_common::Message;
-use nail_core::traits::Listener;
+use nail_core::engine::Listener;
 use nail_lexer::Lexer;
 use std::io;
 
@@ -11,7 +11,7 @@ fn main() {
     let modules = initialize_modules();
     let listeners = wire_modules_to_core(&modules, read, write);
     let lexer = load_lexer().unwrap();
-    let mut core = nail_core::engine::Engine { listeners };
+    let core = nail_core::engine::Engine::new(&listeners);
     loop {
         if let Some(message) = read_message(&lexer) {
             core.tick(&[message]);
@@ -27,15 +27,12 @@ fn wire_modules_to_core(
     modules: &[Box<dyn Module>],
     read: Receiver<Option<Message>>,
     write: Sender<Option<Message>>,
-) -> Vec<Box<dyn Listener>> {
-    let mut result: Vec<Box<dyn Listener>> = vec![];
+) -> Vec<Listener> {
+    let mut result: Vec<Listener> = vec![];
     for module in modules {
         let thread_write = module.start(write.clone());
-        let listener = adventure_lib::Listener {
-            read: read.clone(),
-            write: thread_write,
-        };
-        result.push(Box::new(listener));
+        let listener = Listener::new(read.clone(), thread_write);
+        result.push(listener);
     }
     result
 }

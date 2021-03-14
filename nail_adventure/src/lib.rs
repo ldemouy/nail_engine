@@ -22,11 +22,6 @@ pub struct Room {
     contents: Vec<Item>,
 }
 
-pub struct Listener {
-    pub read: crossbeam::channel::Receiver<Option<nail_common::Message>>,
-    pub write: crossbeam::channel::Sender<Option<nail_common::Message>>,
-}
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Player {
     name: String,
@@ -86,15 +81,5 @@ impl nail_core::traits::Room<Exit, Item> for Room {
 
     fn get_exits(&self) -> Vec<Exit> {
         todo!()
-    }
-}
-
-impl nail_core::traits::Listener for Listener {
-    fn get_receiver(&self) -> &crossbeam::channel::Receiver<Option<nail_common::Message>> {
-        &self.read
-    }
-
-    fn get_sender(&self) -> &crossbeam::channel::Sender<Option<nail_common::Message>> {
-        &self.write
     }
 }
