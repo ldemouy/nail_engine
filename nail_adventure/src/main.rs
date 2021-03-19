@@ -1,6 +1,5 @@
 use adventure_lib::modules::*;
 use crossbeam::channel::{Receiver, Sender};
-use nail_common::Message;
 use nail_core::engine::Listener;
 
 fn main() {

@@ -14,6 +14,7 @@ where
 
 #[derive(Debug, Clone)]
 pub struct Listener<T: Clone + Send + Sync> {
+    name: String,
     read: crossbeam::channel::Receiver<Option<T>>,
     write: crossbeam::channel::Sender<T>,
 }
@@ -23,7 +24,16 @@ impl<T: Clone + Send + Sync> Listener<T> {
         read: crossbeam::channel::Receiver<Option<T>>,
         write: crossbeam::channel::Sender<T>,
     ) -> Listener<T> {
-        Listener { read, write }
+        use guid_create::GUID;
+        Listener {
+            name: GUID::rand().to_string(),
+            read,
+            write,
+        }
+    }
+
+    pub fn get_name(&self) -> String {
+        self.name.clone()
     }
 
     pub fn get_receiver(&self) -> &crossbeam::channel::Receiver<Option<T>> {
@@ -34,13 +44,22 @@ impl<T: Clone + Send + Sync> Listener<T> {
         &self.write
     }
 }
+#[derive(Debug, Clone)]
+pub enum EngineMessage<T> {
+    Register(
+        crossbeam::channel::Receiver<Option<T>>,
+        crossbeam::channel::Sender<T>,
+    ),
+    DeRegister(String),
+    None,
+}
 
 #[derive(Debug, Clone)]
-pub struct Engine<T: Clone + Send + Sync> {
+pub struct Engine<T: Clone + Send + Sync + Into<EngineMessage<T>>> {
     pub listeners: Vec<Listener<T>>,
 }
 
-impl<T: Clone + Send + Sync> Engine<T> {
+impl<T: Clone + Send + Sync + Into<EngineMessage<T>>> Engine<T> {
     pub fn new(listeners: &[Listener<T>]) -> Engine<T> {
         Engine {
             listeners: listeners.to_vec(),
@@ -62,6 +81,16 @@ impl<T: Clone + Send + Sync> Engine<T> {
 
                 while !reader.is_empty() {
                     if let Some(message) = reader.recv().unwrap() {
+                        match message.clone().into() {
+                            EngineMessage::Register(read, write) => {
+                                unimplemented!()
+                            }
+                            EngineMessage::DeRegister(guid) => {
+                                unimplemented!()
+                            }
+                            EngineMessage::None => {}
+                        }
+
                         messages.push(message);
                     }
                 }

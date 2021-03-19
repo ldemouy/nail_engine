@@ -1,5 +1,5 @@
+use super::Message;
 use crossbeam::channel::{Receiver, Sender};
-use nail_common::Message;
 use std::io;
 use std::thread;
 

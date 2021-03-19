@@ -1,5 +1,5 @@
+use super::Message;
 use crossbeam::channel::{Receiver, Sender};
-use nail_common::Message;
 use nail_lexer::Lexer;
 use std::thread;
 
@@ -38,7 +38,7 @@ impl super::Module for LexerModule {
                     let mut tokens = lexer.lex(&message);
                     let action = tokens.first().unwrap().to_owned();
                     tokens.remove(0);
-                    let response = Some(nail_common::Message::TokenMessage {
+                    let response = Some(Message::TokenMessage {
                         action,
                         parameters: tokens,
                     });

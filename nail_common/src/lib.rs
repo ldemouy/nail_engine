@@ -4,16 +4,6 @@ pub struct Token {
     pub contents: String,
 }
 
-#[derive(Debug, Clone)]
-pub enum Message {
-    Initialize,
-    RawInput(String),
-    TokenMessage {
-        action: Token,
-        parameters: Vec<Token>,
-    },
-}
-
 #[cfg(test)]
 mod tests {
     #[test]
