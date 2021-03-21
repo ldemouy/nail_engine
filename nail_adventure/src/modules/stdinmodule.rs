@@ -1,7 +1,6 @@
 use super::Message;
 use crossbeam::channel::{Receiver, Sender};
 use std::io;
-use std::thread;
 
 #[derive(Debug, Default)]
 pub struct StdinModule {}
@@ -28,7 +27,7 @@ impl super::Module for StdinModule {
     fn start(&self, core_write: Sender<Option<Message>>) -> Sender<Message> {
         let (thread_write, thread_read): (Sender<Message>, Receiver<Message>) =
             crossbeam::channel::unbounded();
-        thread::spawn(move || loop {
+        rayon::spawn(move || loop {
             if let Ok(message) = thread_read.recv() {
                 if let Message::Initialize = message {
                     println!("Input: ");

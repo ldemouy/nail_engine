@@ -396,6 +396,7 @@ dependencies = [
  "nail_core",
  "nail_lexer",
  "nail_tui",
+ "rayon",
  "serde",
  "serde_json",
 ]
