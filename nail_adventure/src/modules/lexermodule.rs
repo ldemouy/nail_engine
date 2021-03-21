@@ -1,7 +1,6 @@
 use super::Message;
 use crossbeam::channel::{Receiver, Sender};
 use nail_lexer::Lexer;
-use std::thread;
 
 #[derive(Debug)]
 pub struct LexerModule {
@@ -32,7 +31,7 @@ impl super::Module for LexerModule {
         let (thread_write, thread_read): (Sender<Message>, Receiver<Message>) =
             crossbeam::channel::unbounded();
         let lexer = self.lexer.clone();
-        thread::spawn(move || loop {
+        rayon::spawn(move || loop {
             if let Ok(message) = thread_read.recv() {
                 if let Message::RawInput(message) = message {
                     let mut tokens = lexer.lex(&message);
