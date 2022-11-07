@@ -16,4 +16,4 @@ nail_common = { path = "../nail_common" }
 # Remote
 crossbeam = "0.8"
 rayon = "1.5"
-guid-create = "0.2.0"
+guid-create = "0.3.0"
